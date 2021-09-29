@@ -63,6 +63,6 @@ jobs:
             ```
             ${{ steps.verify.outputs.verify-info }}
             ```
-            Make sure to audit these changes before merging.
+            You should audit changes in the parent recipe yourself before merging.
             
             - This message is auto generated          
