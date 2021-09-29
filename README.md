@@ -21,7 +21,7 @@ After following the deployment steps outlined below to setup your GiHub repo and
 
 ### Initial GitHub Setup
 
-Firstly, you will need to create a new GitHub repository with Actions enabled. You can then clone this repo and copy its contents into your own private repo by running the following Terminal commands:
+Firstly, you will need to create a new GitHub repository with [Actions enabled](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#managing-github-actions-permissions-for-your-repository). You can then clone this repo and copy its contents into your own private repo by running the following Terminal commands:
 
 ```bash
 git clone git@github.com:adahealth/serverless-munki.git
