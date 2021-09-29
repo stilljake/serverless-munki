@@ -1,0 +1,51 @@
+name: Sync Munki Repo
+
+on:
+  push:
+    paths:
+    - 'munki_repo/**'
+    branches:
+    - master
+  workflow_dispatch:
+
+jobs:
+  sync-repo:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          lfs: 'true'
+          fetch-depth: 1
+
+      - name: Install AWS CLI
+        run: |
+          curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
+          sudo installer -pkg ./AWSCLIV2.pkg -target /
+          sudo rm AWSCLIV2.pkg
+      
+      - name: Install Munki
+        run: |
+          curl -OL https://github.com/munki/munki/releases/download/v5.5.0/munkitools-5.5.0.4362.pkg
+          sudo installer -pkg munkitools-5.5.0.4362.pkg -target /
+          sudo rm munkitools-5.5.0.4362.pkg
+    
+      - name: Run makecatalogs
+        run : |
+          /usr/local/munki/makecatalogs "$GITHUB_WORKSPACE"/munki_repo
+      - name: Run AWS s3 sync
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run : |
+          aws s3 sync "$GITHUB_WORKSPACE"/munki_repo s3://opensource-test-ada-munki-munki-s3-bucket --exclude '.DS_Store' --exclude '.keep' --delete
+  
+      - name: Send Slack notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_ICON: https://avatars.githubusercontent.com/u/8826633?s=200&v=4
+          SLACK_USERNAME: Github Actions
+          SLACK_FOOTER: 
+          MSG_MINIMAL: true
+          SLACK_TITLE: Munki repo was synced

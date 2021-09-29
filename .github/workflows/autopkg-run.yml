@@ -1,0 +1,55 @@
+name: AutoPkg Run
+
+on:
+  schedule:
+    - cron: '0 6 * * MON-Fri'
+  workflow_dispatch:
+
+jobs:
+  autopkg-run:
+    runs-on: macos-latest
+
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install python dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip3 install requests
+      
+      - name: Install Munki
+        run: |
+          curl -OL https://github.com/munki/munki/releases/download/v5.5.0/munkitools-5.5.0.4362.pkg
+          sudo installer -pkg munkitools-5.5.0.4362.pkg -target /
+          sudo rm munkitools-5.5.0.4362.pkg
+      
+      - name: Install AutoPkg
+        run: |
+          curl -OL https://github.com/autopkg/autopkg/releases/download/v2.3.1/autopkg-2.3.1.pkg
+          sudo installer -pkg autopkg-2.3.1.pkg -target /
+          sudo rm autopkg-2.3.1.pkg
+       
+      - name: Configure AutoPkg
+        env:
+          TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        run: | 
+          defaults write com.github.autopkg RECIPE_OVERRIDE_DIRS "$GITHUB_WORKSPACE"/autopkg/RecipeOverrides/
+          defaults write com.github.autopkg RECIPE_SEARCH_DIRS "$GITHUB_WORKSPACE"/autopkg/recipes/
+          defaults write com.github.autopkg FAIL_RECIPES_WITHOUT_TRUST_INFO -bool YES
+          defaults write com.github.autopkg MUNKI_REPO "$GITHUB_WORKSPACE"/munki_repo
+          defaults write com.github.autopkg GITHUB_TOKEN "$TOKEN"
+
+      # Add any required parent repos for your recipes here.     
+      - name: Add AutoPkg repos
+        run: | 
+          autopkg repo-add recipes
+      
+      - name: Run makecatalogs
+        run:  /usr/local/munki/makecatalogs munki_repo
+
+      - name: Run AutoPkg
+        run: python3 autopkg/autopkg_tools.py
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

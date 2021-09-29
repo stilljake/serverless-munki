@@ -1,0 +1,11 @@
+.DS_STORE
+
+# Local .terraform directories
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+# Ignore lambda auth function .zip
+*.zip
