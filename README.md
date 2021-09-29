@@ -13,7 +13,7 @@ This repository contains cross platform code to deploy a production ready Munki 
 
 Firstly, you will need to create a new GitHub repository with Actions enabled. You can then clone this repo and copy its contents into your own private repo by running the following Terminal commands:
 
-```
+```bash
 git clone git@github.com:adahealth/serverless-munki.git
 cd serverless-munki
 make init
@@ -21,14 +21,14 @@ make init
 
 By default this will create a new directory named `my-serverless-munki` inside the parent directory of our cloned repo and initialize it as it's own Git repository. Now we can install (if you haven't already) and configure Git LFS for your repo. In our example, We are installing Git LFS via Homebrew but feel free to install it how ever you like.
 
-```
+```bash
 brew install git-lfs
 make lfs
 ```
 
 Then you can go ahead and push your new repo to the Actions enabled GitHub repository you created earlier.
 
-```
+```bash
 cd ../my-serverless-munki
 git remote add origin <your-github-repo-url>
 git branch -M master
@@ -39,7 +39,7 @@ git push -u origin master
 
 Log in to your AWS account and create an AWS IAM user with the following permissions: `AWSLambdaFullAccess`, `IAMFullAccess`, `AmazonS3FullAccess`, `CloudFrontFullAccess`. Then create an access key for the user and set the access key ID and secret key as environment variables. This is so that Terraform can authenticate to the AWS provider. Also, if you don't have Terraform installed you should do that now too.
 
-```
+```bash
 brew install terraform@1.0
 export AWS_ACCESS_KEY_ID="<your-access-key-id>"
 export AWS_SECRET_ACCESS_KEY="<your-secret-key>"
@@ -49,7 +49,7 @@ While we're at it, we can also add both the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_
 
 Next, we need to set our Terraform variables for our AWS configuration. Open the `/terraform/variables.tf` file and adjust the variables to match what you want the bucket to be called, and set the username and password your Munki clients will use to access the repo.
 
-```xml
+```terraform
 # prefix should be globally unique. Some characters seem to cause issues;
 # Something like yourorg_munki might be a good prefix.
 variable "prefix" {
@@ -81,7 +81,7 @@ variable "password" {
 
 Now we can change in to the terraform directory and check our Terraform plan.
 
-```
+```bash
 cd terraform
 terraform init
 terraform plan
@@ -89,13 +89,13 @@ terraform plan
 
 If everything is as expected we can apply the configuration.
 
-```
+```bash
 terraform apply
 ```
 
 That's it for our Munki "server" repository, We can use terraform outputs to obtain info for your client configuration
 
-```
+```bash
 terraform output cloudfront_url 
 # This is your SoftwareRepoURL.
 
@@ -115,7 +115,7 @@ To configure Slack notifications. Simply create an [incoming webhook](https://sl
 
 Add your AutoPKG recipe overrides to the `RecipeOverrides/` folder. Add any necessary parent recipe repos to the `.github/workflows/autopkg-run.yml` workflow file by appending a `repo-add` command to the "Add AutoPkg repos" step.
 
-```
+```yaml
 - name: Add AutoPkg repos
         run: | 
           autopkg repo-add recipes
