@@ -8,7 +8,7 @@ This repository contains cross platform code to deploy a production ready Munki 
 
 ## How it works
 
-After following the deployment steps outlined below to setup your GiHub repo and S3 bucket, an Actions workflow till run daily which does the following:
+After following the deployment steps outlined below to setup your GiHub repo and S3 bucket, an Actions workflow will run daily which does the following:
 
 - Runs any AutoPkg recipes located in your `RecipOverrides/` folder.
 - Imports any new items into the the `munki_repo` folder.
