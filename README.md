@@ -1,6 +1,6 @@
 # Serverless Munki
 
-This repository contains cross platform code to deploy a production ready Munki service, complete with AutoPKG, that runs entirely from within a single GitHub repository and an AWS s3 bucket. No other infrastructure is required. More specifically it contains the following:
+This repository contains cross platform code to deploy a production ready Munki service, complete with AutoPKG, that runs entirely from within a single GitHub repository and an AWS S3 bucket. No other infrastructure is required. More specifically it contains the following:
 
 - Terraform code to setup a Munki repo in AWS S3.
 - Actions workflows to handle AutoPKG runs and related tasks.
