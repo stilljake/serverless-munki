@@ -1,4 +1,6 @@
-# Runs autopkg on all recipe overrides, and posts slack notification if there are any errors
+#!/usr/bin/python3
+
+"""Wrapper script for handling AutoPKG operations."""
 
 import os
 import json
