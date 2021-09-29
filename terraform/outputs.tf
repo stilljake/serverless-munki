@@ -9,11 +9,9 @@ output "munki_bucket_id" {
 }
 
 output "username" {
-  sensitive = true
   value = var.username
 }
 
 output "password" {
-  sensitive = true
   value = var.password
 }
