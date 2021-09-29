@@ -19,7 +19,7 @@ cd serverless-munki
 make init
 ```
 
-By default this will create a new directory named `my-serverless-munki` inside the parent directory of our cloned repo and initialize it as it's own Git repository. Now we can install (if you haven't already) and configure Git LFS for your repo. In our example, We are installing Git LFS via Homebrew but feel free to install it how ever you like.
+By default this will create a new directory named `my-serverless-munki` inside the parent directory of our cloned repo and initialize it as it's own Git repository. Now we can install (if you haven't already) and configure Git LFS for your repo. In our example, We are installing Git LFS via [Homebrew](https://brew.sh/) but feel free to install it how ever you like.
 
 ```bash
 brew install git-lfs
@@ -137,14 +137,22 @@ By default this is scheduled to run at 6am everyday between Monday and Friday. Y
 
 After reviewing and Merging any PRs created via the autopkg-run workflow, the sync-repo workflow will be triggered. This will sync any changes in your munki repo to your AWS S3 bucket where they will be available for your clients.
 
+#### Updating recipe trust info
+
+We update recipe trust info by [manually running](https://docs.github.com/en/actions/managing-workflow-runs/manually-running-a-workflow#running-a-workflow) the `update-trust-info` workflow. Make sure the parent recipe repo is included in the "Add AutoPKG Repos" step in the `.github/workflows/update-trust-info.yml` file before triggering the workflow run.
+
 ### Munki
 
-You can administer your munki repo however you are used to by checking out your GitHub repo locally and making your required changes inside the `munki_repo` folder. When changes are pushed to the remote Master branch, they will be automatically synced to your S3 bucket via the sync-repo workflow.
+You can administer your munki repo however you are used to by checking out your GitHub repo locally and making your required changes inside the `munki_repo` folder. When changes are pushed to the remote Master branch, they will be automatically synced to your S3 bucket via the `sync-repo` workflow.
+
+#### Clean Repo
+
+The `clean-repo` workflow will remove older, unused software items from the munki repo. By default it is scheduled to run every Tuesday at 19:00. You can change this by editing `.github/workflows/clean-repo.yml`.
 
 ## Acknowledgements
 
 [Terraform Munki Repo](https://github.com/grahamgilbert/terraform-aws-munki-repo) module from Graham Gilbert
 
-The autopkg_tools.py script is a fork of Facebook's [autopkg_tools.py](https://github.com/facebook/IT-CPE/blob/main/legacy/autopkg_tools/autopkg_tools.py)
+The `autopkg_tools.py` script is a fork of Facebook's [autopkg_tools.py](https://github.com/facebook/IT-CPE/blob/main/legacy/autopkg_tools/autopkg_tools.py)
 
 The GitHub Actions workflows and this project in general are based heavily on the GitHub Actions AutoPKG setup from [Gusto](https://github.com/Gusto/it-cpe-opensource/tree/main/autopkg)
