@@ -8,4 +8,4 @@
 *.tfstate.*
 
 # Ignore lambda auth function .zip
-*.zip
+basic_auth_lambda.zip
