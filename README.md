@@ -19,7 +19,7 @@ cd serverless-munki
 make init
 ```
 
-By default this will create a new directory named `my-serverless-munki` inside the parent directory of our cloned repo and initialize it as it's own Git repository. Now we can install (if you haven't already) and configure Git LFS for your repo. In our example, We are installing Git LFS via [Homebrew](https://brew.sh/) but feel free to install it how ever you like.
+By default this will create a new directory named `my-serverless-munki` inside the parent directory of our cloned repo and initialize it as it's own Git repository. Now we can install (if you haven't already) and configure Git LFS for your repo. In our example, we are installing Git LFS via [Homebrew](https://brew.sh/) but feel free to install it how ever you like.
 
 ```bash
 brew install git-lfs
@@ -37,7 +37,7 @@ git push -u origin master
 
 ### AWS / Terraform setup
 
-Log in to your AWS account and create an AWS IAM user with the following permissions: `AWSLambdaFullAccess`, `IAMFullAccess`, `AmazonS3FullAccess`, `CloudFrontFullAccess`. Then create an access key for the user and set the access key ID and secret key as environment variables. This is so that Terraform can authenticate to the AWS provider. Also, if you don't have Terraform installed you should do that now too.
+Log in to your AWS account and create an AWS IAM user with the following permissions: `AWSLambdaFullAccess`, `IAMFullAccess`, `AmazonS3FullAccess`, `CloudFrontFullAccess`. Then create an access key for the user and set the access key ID and secret key as environment variables. This is so that Terraform can authenticate to the AWS provider. Also, if you don't have Terraform installed you should do that now.
 
 ```bash
 brew install terraform@1.0
@@ -79,7 +79,7 @@ variable "password" {
 }
 ```
 
-Now we can change in to the terraform directory and check our Terraform plan.
+Now we can change in to the `terraform/` directory and check our Terraform plan.
 
 ```bash
 cd terraform
@@ -93,7 +93,7 @@ If everything is as expected we can apply the configuration.
 terraform apply
 ```
 
-That's it for our Munki "server" repository, We can use terraform outputs to obtain info for your client configuration
+That's it for our Munki "server" repository. We can use terraform outputs to obtain info for your client configuration.
 
 ```bash
 terraform output cloudfront_url 
@@ -102,18 +102,18 @@ terraform output cloudfront_url
 
 terraform output username       
 terraform output password  
-# These are the credentials that your clients will use to access the S3 bucket
+# These are the credentials that your clients will use to access the S3 bucket.
 ```
 
 ### Slack notifications
 
-To configure Slack notifications. Simply create an [incoming webhook](https://slack.com/intl/en-de/help/articles/115005265063-Incoming-webhooks-for-Slack) in your Slack tenant and add the webook URL as a GitHub Actions secret with the name `SLACK_WEBHOOK`
+To configure Slack notifications, simply create an [incoming webhook](https://slack.com/intl/en-de/help/articles/115005265063-Incoming-webhooks-for-Slack) in your Slack tenant and add the webook URL as a GitHub Actions secret with the name `SLACK_WEBHOOK`
 
 ## Usage
 
 ### AutoPKG
 
-Add your AutoPKG recipe overrides to the `RecipeOverrides/` folder. Add any necessary parent recipe repos to the `.github/workflows/autopkg-run.yml` workflow file by appending a `repo-add` command to the "Add AutoPkg repos" step.
+Add your AutoPKG recipe overrides to the `RecipeOverrides/` folder and add any necessary parent recipe repos to the `.github/workflows/autopkg-run.yml` workflow file by appending a `repo-add` command to the "Add AutoPkg repos" step.
 
 ```yaml
 - name: Add AutoPkg repos
@@ -128,14 +128,14 @@ Add your AutoPKG recipe overrides to the `RecipeOverrides/` folder. Add any nece
 Every time the autopkg-run workflow is triggered the following steps will happen inside of a GitHub Actions runner VM:
 
   - Repository is checked out containing AutoPkg overrides and Munki Repo.
-  - Munki and AutoPkg installed and configured.
+  - Munki and AutoPkg is installed and configured.
   - Each recipe in the RecipeOverides directory is run.
-  - If AutoPKG imported any new items into Munki, Commit the changes and create a PR.
+  - If AutoPKG imported any new items into Munki, commit the changes and create a PR.
   - If enabled, post results to Slack.
 
 By default this is scheduled to run at 6am everyday between Monday and Friday. You can change this by editing the schedule in `.github/workflows/autopkg-run.yml`.
 
-After reviewing and Merging any PRs created via the autopkg-run workflow, the sync-repo workflow will be triggered. This will sync any changes in your munki repo to your AWS S3 bucket where they will be available for your clients.
+After reviewing and merging any PRs created via the `autopkg-run` workflow, the `sync-repo` workflow will be triggered. This will sync any changes in your munki repo to your AWS S3 bucket where they will be available for your clients.
 
 #### Updating recipe trust info
 
@@ -143,11 +143,11 @@ We update recipe trust info by [manually running](https://docs.github.com/en/act
 
 ### Munki
 
-You can administer your munki repo however you are used to by checking out your GitHub repo locally and making your required changes inside the `munki_repo` folder. When changes are pushed to the remote Master branch, they will be automatically synced to your S3 bucket via the `sync-repo` workflow.
+You can administer your munki repo whatever way you are used to by checking out your GitHub repo locally and making your required changes inside the `munki_repo` folder. When changes are pushed to the remote Master branch, they will be automatically synced to your S3 bucket via the `sync-repo` workflow.
 
 #### Clean Repo
 
-The `clean-repo` workflow will remove older, unused software items from the munki repo. By default it is scheduled to run every Tuesday at 19:00. You can change this by editing `.github/workflows/clean-repo.yml`.
+The `clean-repo` workflow will remove older, unused software items from the Munki repo. By default it is scheduled to run every Tuesday at 19:00. You can change this by editing `.github/workflows/clean-repo.yml`.
 
 ## Acknowledgements
 
