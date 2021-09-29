@@ -1,12 +1,22 @@
 # Serverless Munki
 
-This repository contains cross platform code to deploy a production ready Munki service, complete with AutoPKG, that runs entirely from within a single GitHub repository and an AWS S3 bucket. No other infrastructure is required. More specifically it contains the following:
+This repository contains cross platform code to deploy a production ready Munki service, complete with AutoPkg, that runs entirely from within a single GitHub repository and an AWS S3 bucket. No other infrastructure is required. More specifically it contains the following:
 
 - Terraform code to setup a Munki repo in AWS S3.
-- Actions workflows to handle AutoPKG runs and related tasks.
-- Directories for maintaining Munki items and AutoPKG overrides.
+- Actions workflows to handle AutoPkg runs and related tasks.
+- Directories for maintaining Munki items and AutoPkg overrides.
 
+## How it works
 
+After following the deployment steps outlined below to setup your GiHub repo and S3 bucket, an Actions workflow till run daily which does the following:
+
+- Runs any AutoPkg recipes located in your `RecipOverrides/` folder.
+- Imports any new items into the the `munki_repo` folder.
+- Git commits changes (pkgs, pkgsinfo) for each item into a separate branch.
+- Creates a PR for each new item.
+- Posts results to Slack (if enabled).
+- Syncs approved changes in `munki_repo` to your S3 bucket where the items will be available to client devices.
+  
 ## Deployment
 
 ### Initial GitHub Setup
@@ -111,9 +121,9 @@ To configure Slack notifications, simply create an [incoming webhook](https://sl
 
 ## Usage
 
-### AutoPKG
+### AutoPkg
 
-Add your AutoPKG recipe overrides to the `RecipeOverrides/` folder and add any necessary parent recipe repos to the `.github/workflows/autopkg-run.yml` workflow file by appending a `repo-add` command to the "Add AutoPkg repos" step.
+Add your AutoPkg recipe overrides to the `RecipeOverrides/` folder and add any necessary parent recipe repos to the `.github/workflows/autopkg-run.yml` workflow file by appending a `repo-add` command to the "Add AutoPkg repos" step.
 
 ```yaml
 - name: Add AutoPkg repos
@@ -130,7 +140,7 @@ Every time the autopkg-run workflow is triggered the following steps will happen
   - Repository is checked out containing AutoPkg overrides and Munki Repo.
   - Munki and AutoPkg is installed and configured.
   - Each recipe in the RecipeOverides directory is run.
-  - If AutoPKG imported any new items into Munki, commit the changes and create a PR.
+  - If AutoPkg imported any new items into Munki, commit the changes and create a PR.
   - If enabled, post results to Slack.
 
 By default this is scheduled to run at 6am everyday between Monday and Friday. You can change this by editing the schedule in `.github/workflows/autopkg-run.yml`.
@@ -139,7 +149,7 @@ After reviewing and merging any PRs created via the `autopkg-run` workflow, the 
 
 #### Updating recipe trust info
 
-We update recipe trust info by [manually running](https://docs.github.com/en/actions/managing-workflow-runs/manually-running-a-workflow#running-a-workflow) the `update-trust-info` workflow. Make sure the parent recipe repo is included in the "Add AutoPKG Repos" step in the `.github/workflows/update-trust-info.yml` file before triggering the workflow run.
+We update recipe trust info by [manually running](https://docs.github.com/en/actions/managing-workflow-runs/manually-running-a-workflow#running-a-workflow) the `update-trust-info` workflow. Make sure the parent recipe repo is included in the "Add AutoPkg Repos" step in the `.github/workflows/update-trust-info.yml` file before triggering the workflow run.
 
 ### Munki
 
@@ -155,4 +165,4 @@ The `clean-repo` workflow will remove older, unused software items from the Munk
 
 The `autopkg_tools.py` script is a fork of Facebook's [autopkg_tools.py](https://github.com/facebook/IT-CPE/blob/main/legacy/autopkg_tools/autopkg_tools.py)
 
-The GitHub Actions workflows and this project in general are based heavily on the GitHub Actions AutoPKG setup from [Gusto](https://github.com/Gusto/it-cpe-opensource/tree/main/autopkg)
+The GitHub Actions workflows and this project in general are based heavily on the GitHub Actions AutoPkg setup from [Gusto](https://github.com/Gusto/it-cpe-opensource/tree/main/autopkg)
