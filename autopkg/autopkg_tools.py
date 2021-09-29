@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+# Copyright (c) Facebook, Inc. and its affiliates.
+# Modifications copyright (C) 2021 Ada Health GmbH
 
 """Wrapper script for handling AutoPKG operations."""
 
