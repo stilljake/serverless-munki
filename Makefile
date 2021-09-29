@@ -2,8 +2,6 @@ SHELL:=/bin/bash
 
 MUNKI_REPO_NAME?=my-serverless-munki
 
-clean:
-	rm -rf ../$(MUNKI_REPO_NAME)
 
 init:
 	mkdir ../$(MUNKI_REPO_NAME)
