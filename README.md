@@ -11,11 +11,11 @@ This repository contains cross platform code to deploy a production ready Munki 
 After following the deployment steps outlined below to setup your GiHub repo and S3 bucket, an Actions workflow till run daily which does the following:
 
 - Runs any AutoPkg recipes located in your `RecipOverrides/` folder.
-- Imports any new items into the the `munki_repo` folder.
+- Imports any new items into the the `munki_repo/` folder.
 - Git commits changes (pkgs, pkgsinfo) for each item into a separate branch.
 - Creates a PR for each new item.
 - Posts results to Slack (if enabled).
-- Syncs approved changes in `munki_repo` to your S3 bucket where the items will be available to client devices.
+- Syncs approved changes in `munki_repo/` to your S3 bucket where the items will be available to client devices.
   
 ## Deployment
 
