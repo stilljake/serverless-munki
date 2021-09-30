@@ -8,7 +8,7 @@ This repository contains cross platform code to deploy a production ready Munki 
 
 ## How it works
 
-After following the deployment steps outlined below to setup your GitHub repo and S3 bucket, an Actions workflow will run daily which does the following:
+After following the deployment steps outlined below to setup your own GitHub repo and S3 bucket, an Actions workflow will run daily which does the following:
 
 - Runs any AutoPkg recipes located in your `RecipOverrides/` folder.
 - Imports any new items into the the `munki_repo/` folder.
@@ -114,6 +114,8 @@ terraform output username
 terraform output password  
 # These are the credentials that your clients will use to access the S3 bucket.
 ```
+
+The [Munki wiki](https://github.com/munki/munki/wiki/Using-Basic-Authentication#configuring-the-clients-to-use-a-password) covers configuring your clients to use BasicAuthentication using the username and password you've chosen. Be sure also to set Munki's SoftwareRepoURL to "https://<your-cloudfront_url>"
 
 ### Slack notifications
 
