@@ -38,7 +38,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run : |
-          aws s3 sync "$GITHUB_WORKSPACE"/munki_repo s3://opensource-test-ada-munki-munki-s3-bucket --exclude '.DS_Store' --exclude '.keep' --delete
+          aws s3 sync "$GITHUB_WORKSPACE"/munki_repo s3://<ADD-YOUR-BUCKET-ID-HERE> --exclude '.DS_Store' --exclude '.keep' --delete
   
       - name: Send Slack notification
         uses: rtCamp/action-slack-notify@v2
