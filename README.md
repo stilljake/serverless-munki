@@ -114,6 +114,12 @@ terraform output username
 terraform output password  
 # These are the credentials that your clients will use to access the S3 bucket.
 ```
+Update the `/.github/workflows/sync-repo.yml` file to include your bucket ID on line 41.
+
+```yaml
+run : |
+          aws s3 sync "$GITHUB_WORKSPACE"/munki_repo s3://<ADD-YOUR-BUCKET-ID-HERE> --exclude '.DS_Store' --exclude '.keep' --delete
+```
 
 The [Munki wiki](https://github.com/munki/munki/wiki/Using-Basic-Authentication#configuring-the-clients-to-use-a-password) covers configuring your clients to use BasicAuthentication using the username and password you've chosen. Be sure also to set Munki's SoftwareRepoURL to "https://<your-cloudfront_url>"
 
