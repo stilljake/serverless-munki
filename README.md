@@ -125,7 +125,7 @@ To configure Slack notifications, simply create an [incoming webhook](https://sl
 
 ### AutoPkg
 
-Add your AutoPkg recipe overrides to the `RecipeOverrides/` folder and add any necessary parent recipe repos to the `.github/workflows/autopkg-run.yml` workflow file by appending a `repo-add` command to the "Add AutoPkg repos" step.
+Add your AutoPkg recipe overrides to the `RecipeOverrides/` folder, commit them to your remote repo and add any necessary parent recipe repos to the `.github/workflows/autopkg-run.yml` workflow file by appending a `repo-add` command to the "Add AutoPkg repos" step.
 
 ```yaml
 - name: Add AutoPkg repos
