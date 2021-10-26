@@ -161,7 +161,7 @@ We update recipe trust info by [manually running](https://docs.github.com/en/act
 
 ### Munki
 
-You can administer your munki repo whatever way you are used to by checking out your GitHub repo locally and making your required changes inside the `munki_repo` folder. When changes are pushed to the remote Master branch, they will be automatically synced to your S3 bucket via the `sync-repo` workflow.
+You can populate and administer your munki repo whatever way you are used to by checking out your GitHub repo locally and making your required changes inside the `munki_repo` folder. When changes are pushed to the remote Master branch, they will be automatically synced to your S3 bucket via the `sync-repo` workflow.
 
 #### Clean Repo
 
