@@ -13,7 +13,7 @@ jobs:
     
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b #v3.0.2
 
       - name: Install AutoPkg
         run: |
@@ -53,7 +53,7 @@ jobs:
           autopkg update-trust-info ${{ github.event.inputs.recipe }}.munki.recipe
       
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v3
+        uses: peter-evans/create-pull-request@923ad837f191474af6b1721408744feb989a4c27 #v4.0.4
         with:
           branch: update-${{ github.event.inputs.recipe }}-trust-info
           title: Update recipe trust info for ${{ github.event.inputs.recipe }}
