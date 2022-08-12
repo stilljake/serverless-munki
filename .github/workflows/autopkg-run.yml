@@ -4,6 +4,10 @@ on:
   schedule:
     - cron: '0 6 * * MON-Fri'
   workflow_dispatch:
+    inputs:
+      recipes:
+        description: List of recipes to run separated by spaces
+        required: False
 
 jobs:
   autopkg-run:
@@ -11,7 +15,7 @@ jobs:
 
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b #v3.0.2
 
       - name: Install python dependencies
         run: |
@@ -20,9 +24,9 @@ jobs:
       
       - name: Install Munki
         run: |
-          curl -OL https://github.com/munki/munki/releases/download/v5.5.0/munkitools-5.5.0.4362.pkg
-          sudo installer -pkg munkitools-5.5.0.4362.pkg -target /
-          sudo rm munkitools-5.5.0.4362.pkg
+          curl -OL https://github.com/munki/munki/releases/download/v5.6.3/munkitools-5.6.3.4401.pkg
+          sudo installer -pkg munkitools-5.6.3.4401.pkg -target /
+          sudo rm munkitools-5.6.3.4401.pkg
       
       - name: Install AutoPkg
         run: |
@@ -53,3 +57,4 @@ jobs:
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_RECIPES: ${{ github.event.inputs.recipes }}

@@ -13,7 +13,7 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b #v3.0.2
         with:
           lfs: 'true'
           fetch-depth: 1
@@ -26,9 +26,9 @@ jobs:
       
       - name: Install Munki
         run: |
-          curl -OL https://github.com/munki/munki/releases/download/v5.5.0/munkitools-5.5.0.4362.pkg
-          sudo installer -pkg munkitools-5.5.0.4362.pkg -target /
-          sudo rm munkitools-5.5.0.4362.pkg
+          curl -OL https://github.com/munki/munki/releases/download/v5.6.3/munkitools-5.6.3.4401.pkg
+          sudo installer -pkg munkitools-5.6.3.4401.pkg -target /
+          sudo rm munkitools-5.6.3.4401.pkg
     
       - name: Run makecatalogs
         run : |
@@ -45,7 +45,7 @@ jobs:
     needs: sync-repo
     steps:
       - name: Send Slack notification
-        uses: rtCamp/action-slack-notify@v2
+        uses: rtCamp/action-slack-notify@12e36fc18b0689399306c2e0b3e0f2978b7f1ee7 #v2.2.0
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_ICON: https://avatars.githubusercontent.com/u/8826633?s=200&v=4

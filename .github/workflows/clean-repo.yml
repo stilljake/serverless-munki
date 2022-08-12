@@ -10,15 +10,15 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b #v3.0.2
         with:
           fetch-depth: 1
     
       - name: Install Munki
         run: |
-          curl -OL https://github.com/munki/munki/releases/download/v5.5.1/munkitools-5.5.1.4365.pkg
-          sudo installer -pkg munkitools-5.5.1.4365.pkg -target /
-          sudo rm munkitools-5.5.1.4365.pkg
+          curl -OL https://github.com/munki/munki/releases/download/v5.6.3/munkitools-5.6.3.4401.pkg
+          sudo installer -pkg munkitools-5.6.3.4401.pkg -target /
+          sudo rm munkitools-5.6.3.4401.pkg
       
       - name: Run makecatalogs
         run: |
@@ -29,7 +29,7 @@ jobs:
           /usr/local/munki/repoclean -a --keep 2 $GITHUB_WORKSPACE/munki_repo
       
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v3
+        uses: peter-evans/create-pull-request@923ad837f191474af6b1721408744feb989a4c27 #v4.0.4
         with:
           branch: clean-munki-repo
           commit-message: Remove old pkgs and pkgsinfo
