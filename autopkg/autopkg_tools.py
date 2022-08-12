@@ -15,6 +15,7 @@ GIT = "/usr/bin/git"
 HUB = "/usr/local/bin/hub"
 REPO_DIR = os.environ['GITHUB_WORKSPACE'] + "/munki_repo"
 GITHUB_TOKEN = os.environ['GITHUB_TOKEN']
+INPUT_RECIPES = os.environ['INPUT_RECIPES'].split()
 
 class Error(Exception):
   """Base class for domain-specific exceptions."""
@@ -227,7 +228,7 @@ def imported_message(imported):
         
 def failures_message(failed):
     """Format a list of failed recipes for a slack message"""
-    failures_msg = 	[            
+    failures_msg =  [              
         {
             "color": '#f2c744', "blocks": [
                 {
@@ -246,7 +247,7 @@ def failures_message(failed):
             {
                 "type": "section", "text": {"type": "mrkdwn", "text": f"{name}"}
             },
-            {					
+            {                   
                 "type": "section", "text": {"type": "mrkdwn", "text": f"```{info}```"}
             }
         ]
@@ -271,7 +272,7 @@ def git_errors_message(git_info):
         name = item['branch']
         info = item['error']
         git_info = [
-            {					
+            {                   
                 "type": "section", "text": {"type": "mrkdwn", "text": f"error pushing branch: {name} ```{info}```"}
             }
         ]
@@ -285,10 +286,10 @@ def format_slack_message(imported, failed, git_info):
         "attachments": [
             {
                 "color": "#4bb543","blocks": [
-                    {"type": "section","text": {"type": "mrkdwn","text": ":package: *AutoPkg has finished running*"}}				
+                    {"type": "section","text": {"type": "mrkdwn","text": ":package: *AutoPkg has finished running*"}}               
                 ]
             }          
-	    ]
+        ]
     }
     if not imported:
         msg_info = [
@@ -323,11 +324,14 @@ def autopkg_run(recipe):
     autopkg_cmd.append("report.plist")
     run_live(autopkg_cmd)
         
-def handle_recipes():    
-    recipes = get_recipes()
+def handle_recipes():
     imported = []
     failed = [] 
     git_errors = []
+    if INPUT_RECIPES:
+        recipes = INPUT_RECIPES
+    else:
+        recipes = get_recipes()
     for recipe in recipes:
         # Parse the recipe name for basic item name
         branchname = parse_recipe_name(recipe)

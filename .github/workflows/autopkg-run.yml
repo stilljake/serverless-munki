@@ -4,6 +4,10 @@ on:
   schedule:
     - cron: '0 6 * * MON-Fri'
   workflow_dispatch:
+    inputs:
+      recipes:
+        description: List of recipes to run separated by spaces
+        required: False
 
 jobs:
   autopkg-run:
