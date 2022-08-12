@@ -16,9 +16,9 @@ jobs:
     
       - name: Install Munki
         run: |
-          curl -OL https://github.com/munki/munki/releases/download/v5.5.1/munkitools-5.5.1.4365.pkg
-          sudo installer -pkg munkitools-5.5.1.4365.pkg -target /
-          sudo rm munkitools-5.5.1.4365.pkg
+          curl -OL https://github.com/munki/munki/releases/download/v5.6.3/munkitools-5.6.3.4401.pkg
+          sudo installer -pkg munkitools-5.6.3.4401.pkg -target /
+          sudo rm munkitools-5.6.3.4401.pkg
       
       - name: Run makecatalogs
         run: |
