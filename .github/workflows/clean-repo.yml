@@ -10,7 +10,7 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b #v3.0.2
         with:
           fetch-depth: 1
     
@@ -29,7 +29,7 @@ jobs:
           /usr/local/munki/repoclean -a --keep 2 $GITHUB_WORKSPACE/munki_repo
       
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v3
+        uses: peter-evans/create-pull-request@923ad837f191474af6b1721408744feb989a4c27 #v4.0.4
         with:
           branch: clean-munki-repo
           commit-message: Remove old pkgs and pkgsinfo
