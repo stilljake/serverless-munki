@@ -1,12 +1,16 @@
 # Serverless Munki
 
+## Summary
 This repository contains cross platform code to deploy a production ready Munki service, complete with AutoPkg, that runs entirely from within a single GitHub repository and an AWS S3 bucket. No other infrastructure is required. More specifically it contains the following:
 
 - Terraform code to setup a Munki repo in AWS S3.
 - Actions workflows to handle AutoPkg runs and related tasks.
 - Directories for maintaining Munki items and AutoPkg overrides.
 
-## How it works
+## Classification
+[![Confidentiality](https://img.shields.io/badge/confidentiality-C1_(Public)-green?style=plastic)](https://adahealth.atlassian.net/wiki/spaces/IS/pages/808171/ISMS+Policy+2.+Information+Classification+and+Handling#5.1.3.-Confidentiality)
+
+## Usage
 
 After following the deployment steps outlined below to setup your own GitHub repo and S3 bucket, an Actions workflow will run daily which does the following:
 
