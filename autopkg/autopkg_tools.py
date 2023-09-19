@@ -10,41 +10,48 @@ import requests
 import subprocess
 import plistlib
 
+
 WEBHOOK_URL = os.environ['SLACK_WEBHOOK']
 GIT = "/usr/bin/git"
-HUB = "/usr/local/bin/hub"
+GITHUB_CLI = "gh"
 REPO_DIR = os.environ['GITHUB_WORKSPACE'] + "/munki_repo"
 GITHUB_TOKEN = os.environ['GITHUB_TOKEN']
 INPUT_RECIPES = os.environ['INPUT_RECIPES'].split()
 
+
 class Error(Exception):
-  """Base class for domain-specific exceptions."""
+    """Base class for domain-specific exceptions."""
+
 
 class GitError(Error):
-  """Git exceptions."""
+    """Git exceptions."""
+
 
 class BranchError(Error):
-  """Branch-related exceptions."""
+    """Branch-related exceptions."""
+
 
 class PushError(Error):
-  """Push-related exceptions."""
+    """Push-related exceptions."""
+
 
 # Utility functions
 def run_cmd(cmd):
-  """Run a command and return the output."""
-  proc = subprocess.Popen(
-    cmd,
-    stdout=subprocess.PIPE,
-    stderr=subprocess.PIPE
-  )
-  (out, err) = proc.communicate()
-  results_dict = {
-    'stdout': out,
-    'stderr': err,
-    'status': proc.returncode,
-    'success': proc.returncode == 0
-  }
-  return results_dict
+    """Run a command and return the output."""
+    proc = subprocess.Popen(
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
+    (out, err) = proc.communicate()
+    results_dict = {
+        'stdout': out,
+        'stderr': err,
+        'status': proc.returncode,
+        'success': proc.returncode == 0
+    }
+    return results_dict
+
 
 def run_live(command):
     """Run a command with real-time output"""
@@ -54,11 +61,12 @@ def run_live(command):
         text=True
     )
     results_dict = {
-    'status': proc.returncode,
-    'success': proc.returncode == 0,
-    'stderr': proc.stderr
+        'status': proc.returncode,
+        'success': proc.returncode == 0,
+        'stderr': proc.stderr
     }
     return results_dict
+
 
 # Recipe handling
 def get_recipes():
@@ -70,15 +78,17 @@ def get_recipes():
                 recipes.append(file)
     return recipes
 
+
 def parse_recipe_name(identifier):
     """Get the name of the recipe."""
     branch = identifier.replace(' ', '-').lower().split('.munki')[0]
     # Check to see if branch name already exists
     current_branches = branch_list()
     if branch in current_branches:
-     # If the same name already exists, append a '-2' to it
+        # If the same name already exists, append a '-2' to it
         branch += '-2'
     return branch
+
 
 def parse_report_plist(report_plist_path):
     """Parse the report plist path for a dict of the results."""
@@ -89,19 +99,20 @@ def parse_report_plist(report_plist_path):
     if report_data['summary_results']:
         # This means something happened
         munki_results = report_data['summary_results'].get(
-        'munki_importer_summary_result', {}
+            'munki_importer_summary_result', {}
         )
         for imported_item in munki_results.get('data_rows', []):
             imported_items.append(imported_item)
     if report_data['failures']:
         # This means something went wrong
         for failed_item in report_data['failures']:
-        # For each recipe that failed, file a task
+            # For each recipe that failed, file a task
             failed_items.append(failed_item)
     return {
         'imported': imported_items,
         'failed': failed_items
     }
+
 
 # Git-related functions
 def git_run(arglist):
@@ -118,26 +129,31 @@ def git_run(arglist):
         raise GitError("Git error: %s" % results['stderr'])
     return results['stdout']
 
+
 def branch_list():
     """Get the list of current git branches."""
     git_args = ['branch']
     branch_output = git_run(git_args).rstrip()
     if branch_output:
-        return [x.strip().strip('* ') for x in branch_output.decode().split('\n')]
+        return [x.strip().strip('* ')
+                for x in branch_output.decode().split('\n')]
     return []
+
 
 def current_branch():
     """Return the name of the current git branch."""
     git_args = ['symbolic-ref', '--short', 'HEAD']
     return str(git_run(git_args).strip())
 
+
 def create_feature_branch(branch):
     """Create new feature branch."""
     if current_branch() != 'master':
-    # Switch to master first if we're not already there
+        # Switch to master first if we're not already there
         change_feature_branch('master')
     # Now create new branch
     change_feature_branch(branch, new=True)
+
 
 def change_feature_branch(branch, new=False):
     """Swap to feature branch."""
@@ -152,15 +168,17 @@ def change_feature_branch(branch, new=False):
             "Couldn't switch to '%s': %s" % (branch, e)
         )
 
+
 def rename_branch_version(branch, version):
-  """Rename a branch to include the version."""
-  new_branch_name = branch + "-%s" % version
-  if new_branch_name in branch_list():
-    print("Branch %s already exists" % new_branch_name)
-    new_branch_name += '-2'
-  gitcmd = ['branch', '-m', branch, new_branch_name]
-  git_run(gitcmd)
-  return new_branch_name
+    """Rename a branch to include the version."""
+    new_branch_name = branch + "-%s" % version
+    if new_branch_name in branch_list():
+        print("Branch %s already exists" % new_branch_name)
+        new_branch_name += '-2'
+    gitcmd = ['branch', '-m', branch, new_branch_name]
+    git_run(gitcmd)
+    return new_branch_name
+
 
 def git_push(branch):
     """Perform a git push."""
@@ -180,17 +198,21 @@ def git_push(branch):
         'success': True
     }
 
+
 def pull_request(branchname):
     """Create Pull request using the hub cli tool."""
     if not GITHUB_TOKEN:
         print('Pull request not created.. GITHUB_TOKEN not set')
         return
     print('Creating Pull Request...')
-    hubcmd = [HUB]
-    hubcmd.append('pull-request')
-    hubcmd.append('-m')
-    hubcmd.append(branchname)
-    run_cmd(hubcmd)
+    run_cmd([
+      GITHUB_CLI,
+      "pr", "create",
+      "-B", "main",
+      "-H", branchname,
+      "-f"
+    ])
+
 
 def create_commit(imported_item):
     """Create git commit."""
@@ -201,102 +223,108 @@ def create_commit(imported_item):
     print('Creating commit...')
     gitcommitcmd = ['commit', '-m']
     message = "Update %s to version %s" % (str(imported_item['name']),
-                                            str(imported_item["version"]))
+                                           str(imported_item["version"]))
     gitcommitcmd.append(message)
     git_run(gitcommitcmd)
+
 
 # Slack related functions
 def imported_message(imported):
     """Format a list of imported items for a slack message"""
-    imported_msg = [
-        {
-            "type": "section",
-            "text": {"type": "plain_text", "text": "The following items will be imported into munki after approval"}     
+    imported_msg = [{
+        "type": "section",
+        "text": {
+            "type": "plain_text",
+            "text": "The following items will be imported "
+                    "into munki after approval"
         }
-    ]
+    }]
     for item in imported:
         version = item["version"]
         name = item["branchname"]
-        imported_info = [
-            {
-                "type": "section", "text": {"type": "mrkdwn", "text": f"• {name} version {version}"}
+        imported_info = [{
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": f"• {name} version {version}"
             }
-        ]
+        }]
         imported_msg.extend(imported_info)
-    
+
     return imported_msg
-        
+
+
 def failures_message(failed):
     """Format a list of failed recipes for a slack message"""
-    failures_msg =  [              
-        {
-            "color": '#f2c744', "blocks": [
-                {
-                    "type": "divider"
-                },
-                {
-                    "type": "section", "text": {"type": "mrkdwn", "text": ":warning: *The following recipes failed*"}
-                }
-            ]
-        }
-    ]
+    failures_msg = [{
+        "color": '#f2c744',
+        "blocks": [
+            {"type": "divider"},
+            {"type": "section",
+             "text": {
+                 "type": "mrkdwn",
+                 "text": ":warning: *The following recipes failed*"
+             }}
+        ]
+    }]
     for item in failed:
         info = item["message"]
         name = item["recipe"]
         failure_info = [
-            {
-                "type": "section", "text": {"type": "mrkdwn", "text": f"{name}"}
-            },
-            {                   
-                "type": "section", "text": {"type": "mrkdwn", "text": f"```{info}```"}
-            }
+            {"type": "section",
+             "text": {"type": "mrkdwn", "text": f"{name}"}},
+            {"type": "section",
+             "text": {"type": "mrkdwn", "text": f"```{info}```"}}
         ]
         failures_msg[0]['blocks'].extend(failure_info)
     return failures_msg
 
+
 def git_errors_message(git_info):
     """Format a list of any git errors to send as slack message"""
-    git_msg = [
-        {
-            "color": "#f2c744", "blocks": [
-                {
-                    "type": "divider"
-                },
-                {
-                    "type": "section", "text": {"type": "mrkdwn", "text": ":github: *Git errors*"}
-                }
-            ]
-        }
+    git_msg = [{
+        "color": "#f2c744",
+        "blocks": [
+            {"type": "divider"},
+            {"type": "section",
+             "text": {"type": "mrkdwn", "text": ":github: *Git errors*"}},
+        ]}
     ]
     for item in git_info:
         name = item['branch']
         info = item['error']
-        git_info = [
-            {                   
-                "type": "section", "text": {"type": "mrkdwn", "text": f"error pushing branch: {name} ```{info}```"}
-            }
-        ]
+        git_info = [{
+            "type": "section",
+            "text": {"type": "mrkdwn",
+                     "text": f"error pushing branch: {name} ```{info}```"}
+        }]
         git_msg[0]['blocks'].extend(git_info)
     return git_msg
+
 
 def format_slack_message(imported, failed, git_info):
     """Compose notification to be sent to slack"""
     message = {
-        "blocks": [], 
-        "attachments": [
-            {
-                "color": "#4bb543","blocks": [
-                    {"type": "section","text": {"type": "mrkdwn","text": ":package: *AutoPkg has finished running*"}}               
-                ]
-            }          
-        ]
+        "blocks": [],
+        "attachments": [{
+            "color": "#4bb543",
+            "blocks": [{
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": ":package: *AutoPkg has finished running*"
+                 }
+            }]
+        }]
     }
     if not imported:
-        msg_info = [
-            {
-                "type": "section","text": {"type": "mrkdwn","text": "There are no new items to be imported into Munki"}
+        msg_info = [{
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "There are no new items to be imported into Munki"
             }
-        ]
+        }]
         message['attachments'][0]['blocks'].extend(msg_info)
     else:
         message['attachments'][0]['blocks'].extend(imported_message(imported))
@@ -305,7 +333,8 @@ def format_slack_message(imported, failed, git_info):
     if git_info:
         message['attachments'].extend(git_errors_message(git_info))
 
-    return message  
+    return message
+
 
 def post_to_slack(message):
     """Post slack message to the WEBHOOK_URL"""
@@ -315,6 +344,7 @@ def post_to_slack(message):
                 )
     print(f"Post Slack Message: status: {response.status_code}")
 
+
 # Autopkg execution functions
 def autopkg_run(recipe):
     """Run autopkg on given recipe"""
@@ -323,10 +353,11 @@ def autopkg_run(recipe):
     autopkg_cmd.append("--report-plist")
     autopkg_cmd.append("report.plist")
     run_live(autopkg_cmd)
-        
+
+
 def handle_recipes():
     imported = []
-    failed = [] 
+    failed = []
     git_errors = []
     if INPUT_RECIPES:
         recipes = INPUT_RECIPES
@@ -337,7 +368,7 @@ def handle_recipes():
         branchname = parse_recipe_name(recipe)
         # Create new branch for item
         create_feature_branch(branchname)
-        # Run Autopkg          
+        # Run Autopkg
         autopkg_run(recipe)
         # Parse the results from report plist
         run_results = parse_report_plist("report.plist")
@@ -346,32 +377,37 @@ def handle_recipes():
             continue
         if run_results['failed']:
             # Add to list of failed items
-            failed.append(run_results['failed'][0])  
+            failed.append(run_results['failed'][0])
         if run_results['imported']:
             # Commit changes
             create_commit(run_results['imported'][0])
-            branch_version = rename_branch_version(branchname, str(run_results['imported'][0]['version']))
+            branch_version = rename_branch_version(
+                branchname,
+                str(run_results['imported'][0]['version'])
+            )
             # Push changes to github
             push_result = git_push(branch_version)
             if not push_result['success']:
                 # This means there was a problem pushing changes to github
                 # Add to list of git errors
                 git_errors.append(push_result)
-            else: 
+            else:
                 # If push was successful then create a PR
-                pull_request(branch_version)    
-                # Add basic item name to imported results so we can tell the difference between arm and intel items
+                pull_request(branch_version)
+                # Add basic item name to imported results so we can tell
+                # the difference between arm and intel items
                 run_results['imported'][0]['branchname'] = branchname
                 # Add to list of imported items
                 imported.append(run_results['imported'][0])
-       
+
     if not WEBHOOK_URL:
         print("Slack Webhook not set.. No notification sent.")
         return
-    
-    # Send a report of what happened to slack    
+
+    # Send a report of what happened to slack
     slack_notification = format_slack_message(imported, failed, git_errors)
     post_to_slack(slack_notification)
-    
+
+
 if __name__ == '__main__':
     handle_recipes()
